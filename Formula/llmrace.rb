@@ -1,9 +1,9 @@
 class Llmrace < Formula
   desc "Race LLM providers head-to-head in your terminal: latency, TTFB, tokens/s, p95 and cost"
   homepage "https://github.com/dfbustosus/llmrace"
-  url "https://github.com/dfbustosus/llmrace/releases/download/v0.2.0/llmrace-v0.2.0-aarch64-apple-darwin.tar.gz"
-  version "0.2.0"
-  sha256 "815ed015b4442277967d4ec25f20c4648c29146255fe5f0c69d5b228fa0ad0ab"
+  url "https://github.com/dfbustosus/llmrace/releases/download/v0.3.0/llmrace-v0.3.0-aarch64-apple-darwin.tar.gz"
+  version "0.3.0"
+  sha256 "6df71945803266569c2c47abaa8174b93b52f506cf10b82a3df1557388f23c4a"
 
   livecheck do
     url :stable
@@ -11,13 +11,13 @@ class Llmrace < Formula
   end
 
   on_intel do
-    url "https://github.com/dfbustosus/llmrace/releases/download/v0.2.0/llmrace-v0.2.0-x86_64-apple-darwin.tar.gz"
-    sha256 "17aa324ce1981bc83d3067f26742d409cb24bd9d092f2092364bbb72a310f5ec"
+    url "https://github.com/dfbustosus/llmrace/releases/download/v0.3.0/llmrace-v0.3.0-x86_64-apple-darwin.tar.gz"
+    sha256 "daf47e0e50312a88b49fc981c1ac1ea820a491655e48e80134bd1daa42c4ff4b"
   end
 
   on_linux do
-    url "https://github.com/dfbustosus/llmrace/releases/download/v0.2.0/llmrace-v0.2.0-x86_64-unknown-linux-gnu.tar.gz"
-    sha256 "4f248e3bd8af78b91199e966675caaf8f3bd897d81e46a9696c35d3c897e5a29"
+    url "https://github.com/dfbustosus/llmrace/releases/download/v0.3.0/llmrace-v0.3.0-x86_64-unknown-linux-gnu.tar.gz"
+    sha256 "9a01a23a644f7a51a407284eb4faf46695937d46073938c85808fef61ad1faac"
   end
 
   def install
