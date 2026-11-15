@@ -43,20 +43,19 @@ jobs:
             echo "formula already at ${VERSION}"
             exit 0
           fi
-          sed -i \
-            -e "s|releases/download/v[0-9.]*/|releases/download/v${VERSION}/|g" \
-            -e "s|version \"[0-9.]*\"|version \"${VERSION}\"|" \
-            Formula/llmrace.rb
-          # replace the three checksums in file order: arm64, intel, linux
-          python3 - <<'EOF'
-          import re
+          python3 - <<'PYEOF'
+          import os, re
+          version = os.environ["VERSION"]
           p = "Formula/llmrace.rb"
           src = open(p).read()
-          sums = [__import__('os').environ[k] for k in ["ARM", "INTEL", "LINUX"]]
+          # every artifact URL embeds the version twice (path and filename)
+          src = re.sub(r"v\d+\.\d+\.\d+", f"v{version}", src)
+          src = re.sub(r'version "v[0-9.]+"', f'version "{version}"', src)
+          sums = [os.environ[k] for k in ["ARM", "INTEL", "LINUX"]]
           it = iter(sums)
           src = re.sub(r'sha256 "[0-9a-f]{64}"', lambda m: f'sha256 "{next(it)}"', src)
           open(p, "w").write(src)
-          EOF
+          PYEOF
           git config user.name "llmrace-release-bot"
           git config user.email "noreply@users.noreply.github.com"
           git add Formula/llmrace.rb
