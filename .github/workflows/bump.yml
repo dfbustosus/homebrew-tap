@@ -1,0 +1,64 @@
+name: Bump formula
+
+# Keeps Formula/llmrace.rb in sync with the latest llmrace release.
+# Runs on schedule and on demand — no cross-repo secrets required.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 * * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Resolve latest release and checksums
+        id: latest
+        run: |
+          set -euo pipefail
+          tag="$(curl -sf https://api.github.com/repos/dfbustosus/llmrace/releases/latest | jq -r .tag_name)"
+          version="${tag#v}"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          base="https://github.com/dfbustosus/llmrace/releases/download/${tag}"
+          for t in aarch64-apple-darwin x86_64-apple-darwin x86_64-unknown-linux-gnu; do
+            sum="$(curl -sfL "${base}/llmrace-v${version}-${t}.tar.gz.sha256" | awk '{print $1}')"
+            [ -n "$sum" ] || { echo "missing checksum for $t"; exit 1; }
+            echo "${t}=${sum}" >> "$GITHUB_OUTPUT"
+          done
+
+      - name: Update formula
+        env:
+          VERSION: ${{ steps.latest.outputs.version }}
+          ARM: ${{ steps.latest.outputs.aarch64-apple-darwin }}
+          INTEL: ${{ steps.latest.outputs.x86_64-apple-darwin }}
+          LINUX: ${{ steps.latest.outputs.x86_64-unknown-linux-gnu }}
+        run: |
+          set -euo pipefail
+          if grep -q "version \"${VERSION}\"" Formula/llmrace.rb; then
+            echo "formula already at ${VERSION}"
+            exit 0
+          fi
+          sed -i \
+            -e "s|releases/download/v[0-9.]*/|releases/download/v${VERSION}/|g" \
+            -e "s|version \"[0-9.]*\"|version \"${VERSION}\"|" \
+            Formula/llmrace.rb
+          # replace the three checksums in file order: arm64, intel, linux
+          python3 - <<'EOF'
+          import re
+          p = "Formula/llmrace.rb"
+          src = open(p).read()
+          sums = [__import__('os').environ[k] for k in ["ARM", "INTEL", "LINUX"]]
+          it = iter(sums)
+          src = re.sub(r'sha256 "[0-9a-f]{64}"', lambda m: f'sha256 "{next(it)}"', src)
+          open(p, "w").write(src)
+          EOF
+          git config user.name "llmrace-release-bot"
+          git config user.email "noreply@users.noreply.github.com"
+          git add Formula/llmrace.rb
+          git commit -m "llmrace ${VERSION}"
+          git push
