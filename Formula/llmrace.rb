@@ -4,9 +4,6 @@ class Llmrace < Formula
   url "https://github.com/dfbustosus/llmrace/releases/download/v1.2.0/llmrace-v1.2.0-aarch64-apple-darwin.tar.gz"
   version "1.2.0"
   sha256 "3d1c1928eb66706f2b5605f558d32b3c8d8f54067f39e6f5645f6c93a174f6d0"
-  url "https://github.com/dfbustosus/llmrace/releases/download/v1.2.0/llmrace-v1.2.0-aarch64-apple-darwin.tar.gz"
-  version "1.2.0"
-  sha256 "959ba564d54a365f625a7c422540ab11bf3dcd2e3fcc5224a329de37cf59158c"
 
   livecheck do
     url :stable
