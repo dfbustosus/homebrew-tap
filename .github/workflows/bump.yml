@@ -19,9 +19,12 @@ jobs:
 
       - name: Resolve latest release and checksums
         id: latest
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          tag="$(curl -sf https://api.github.com/repos/dfbustosus/llmrace/releases/latest | jq -r .tag_name)"
+          tag="$(curl -sf -H "Authorization: Bearer $GH_TOKEN" https://api.github.com/repos/dfbustosus/llmrace/releases/latest | jq -r .tag_name)"
+          [ "$tag" != "null" ] && [ -n "$tag" ] || { echo "could not resolve latest release"; exit 1; }
           version="${tag#v}"
           echo "version=$version" >> "$GITHUB_OUTPUT"
           base="https://github.com/dfbustosus/llmrace/releases/download/${tag}"
